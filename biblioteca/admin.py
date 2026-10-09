@@ -4,16 +4,23 @@ from biblioteca.models import Author, Book, Category
 
 
 class BookInline(admin.TabularInline):
-	model = Book
+	model = Book.authors.through
 	extra = 0
 
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-	list_display = ("title", "author", "publication_year", "available")
-	search_fields = ("title", "author__name")
-	list_filter = ("available", "categories")
-	filter_horizontal = ("categories",)
+	list_display = ("title", "authors_display", "data_publicacao", "disponivel")
+	search_fields = ("title", "authors__name")
+	list_filter = ("disponivel", "categories")
+	filter_horizontal = ("authors", "categories")
+
+	@admin.display(description="Autores")
+	def authors_display(self, obj):
+		return ", ".join(author.name for author in obj.authors.all())
+
+	def get_queryset(self, request):
+		return super().get_queryset(request).prefetch_related("authors")
 
 
 @admin.register(Author)

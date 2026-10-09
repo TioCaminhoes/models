@@ -20,6 +20,6 @@ from biblioteca.views import author_detail, listar_livros
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', listar_livros),
+    path('', listar_livros, name='home'),
     path('authors/<int:author_id>/', author_detail, name='author_detail'),
 ]

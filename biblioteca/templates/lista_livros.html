@@ -1,16 +1,117 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Livros Disponíveis</h1>
-    <ul>
-        {% for livro in livros %}
-            <li>{{ livro.title }} - <a href="{% url 'author_detail' livro.author.pk %}">{{ livro.author }}</a> ({{ livro.publication_year }}) Status: {{ livro.available }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Acervo de livros — Estante{% endblock %}
+{% block nav_catalog %}is-active{% endblock %}
+{% block content %}
+    <section class="welcome-row">
+        <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> BIBLIOTECA DIGITAL</div>
+            <h1>Encontre sua próxima<br class="desktop-break"> <span>boa leitura.</span></h1>
+            <p class="page-intro">Explore o acervo, descubra novos autores e escolha por onde começar.</p>
+        </div>
+        <div class="welcome-art" aria-hidden="true">
+            <div class="art-sun"></div>
+            <div class="art-book art-book-back"></div>
+            <div class="art-book art-book-front"><span></span><i></i></div>
+            <div class="art-sparkle sparkle-one">✳</div>
+            <div class="art-sparkle sparkle-two">✦</div>
+        </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Resumo do acervo">
+        <article class="stat-card">
+            <span class="stat-icon stat-icon-lilac" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H11v16H6.5A1.5 1.5 0 0 1 5 18.5v-13ZM13 4h4.5A1.5 1.5 0 0 1 19 5.5v13a1.5 1.5 0 0 1-1.5 1.5H13V4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="stat-copy"><span class="stat-label">TÍTULOS NO ACERVO</span><strong>{{ total_livros }}</strong></span>
+            <span class="stat-decoration" aria-hidden="true">↗</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon stat-icon-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5 9.2 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="stat-copy"><span class="stat-label">DISPONÍVEIS AGORA</span><strong>{{ livros_disponiveis }}</strong></span>
+            <span class="stat-decoration" aria-hidden="true">✳</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-icon stat-icon-peach" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 20v-1.25A5.25 5.25 0 0 1 10.75 13.5h2.5a5.25 5.25 0 0 1 5.25 5.25V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </span>
+            <span class="stat-copy"><span class="stat-label">AUTORES</span><strong>{{ total_autores }}</strong></span>
+            <span class="stat-decoration" aria-hidden="true">✳</span>
+        </article>
+    </section>
+
+    <section class="collection-section" aria-labelledby="collection-title">
+        <div class="section-heading">
+            <div>
+                <div class="eyebrow section-eyebrow">A ESTANTE</div>
+                <h2 id="collection-title">Todos os livros <span class="title-count">{{ total_livros }}</span></h2>
+            </div>
+            <label class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3" stroke="currentColor" stroke-width="1.7"/><path d="m15.5 15.5 4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <input id="book-search" type="search" placeholder="Buscar livro ou autor..." aria-label="Buscar livro ou autor">
+                <kbd>/</kbd>
+            </label>
+        </div>
+
+        <div class="collection-toolbar">
+            <div class="filter-tabs" role="group" aria-label="Filtrar por disponibilidade">
+                <button class="filter-tab is-selected" type="button" data-filter="all" aria-pressed="true">Todos <span>{{ total_livros }}</span></button>
+                <button class="filter-tab" type="button" data-filter="available" aria-pressed="false">Disponíveis <span>{{ livros_disponiveis }}</span></button>
+                <button class="filter-tab" type="button" data-filter="unavailable" aria-pressed="false">Emprestados <span>{{ livros_emprestados }}</span></button>
+            </div>
+            <span class="results-label" id="results-label">Exibindo {{ total_livros }} {% if total_livros == 1 %}livro{% else %}livros{% endif %}</span>
+        </div>
+
+        <div class="book-list" id="book-list">
+            {% for livro in livros %}
+                <article class="book-card" data-availability="{% if livro.available %}available{% else %}unavailable{% endif %}" data-search="{{ livro.title|lower }} {% for author in livro.authors.all %}{{ author.name|lower }} {% endfor %}{{ livro.publication_year }}">
+                    <div class="book-cover cover-{{ forloop.counter0|add:'1'|divisibleby:'4'|yesno:'plum,coral' }}">
+                        <span class="cover-mark" aria-hidden="true"></span>
+                        <span class="cover-lines" aria-hidden="true"></span>
+                        <span class="cover-initial">{{ livro.title|first|upper }}</span>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title-row">
+                            <h3 class="book-title">{{ livro.title }}</h3>
+                            {% if livro.available %}
+                                <span class="availability availability-yes"><span></span>Disponível</span>
+                            {% else %}
+                                <span class="availability availability-no"><span></span>Emprestado</span>
+                            {% endif %}
+                        </div>
+                        <div class="book-authors">
+                            {% for author in livro.authors.all %}
+                                {% if not forloop.first %}<span class="author-separator">, </span>{% endif %}<a class="book-author" href="{% url 'author_detail' author.pk %}">{{ author.name }}</a>
+                            {% endfor %}
+                        </div>
+                        <div class="book-meta">
+                            <span class="book-year">{{ livro.publication_year }}</span>
+                            {% for category in livro.categories.all %}
+                                <span class="category-chip">{{ category.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% with primary_author=livro.authors.all|first %}
+                        {% if primary_author %}<a class="book-arrow" href="{% url 'author_detail' primary_author.pk %}" aria-label="Ver livros de {{ primary_author.name }}">↗</a>{% endif %}
+                    {% endwith %}
+                </article>
+            {% empty %}
+                <div class="empty-state" id="empty-state">
+                    <span class="empty-icon" aria-hidden="true">✳</span>
+                    <h3>Uma estante pronta para histórias</h3>
+                    <p>Os livros cadastrados aparecerão aqui. Acesse a administração para começar.</p>
+                    <a class="button-primary" href="/admin/">Abrir administração <span aria-hidden="true">↗</span></a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="empty-state search-empty" id="search-empty" hidden>
+            <span class="empty-icon" aria-hidden="true">⌕</span>
+            <h3>Nenhum livro encontrado</h3>
+            <p>Tente buscar por outro título ou nome de autor.</p>
+        </div>
+    </section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'biblioteca/catalogo.js' %}" defer></script>{% endblock %}
