@@ -10,9 +10,9 @@ class BookInline(admin.TabularInline):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-	list_display = ("title", "author", "publication_year", "available")
+	list_display = ("title", "author", "ano_publicado", "disponivel")
 	search_fields = ("title", "author__name")
-	list_filter = ("available", "categories")
+	list_filter = ("disponivel", "categories")
 	filter_horizontal = ("categories",)
 
 

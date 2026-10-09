@@ -19,7 +19,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(
@@ -27,8 +26,8 @@ class Book(models.Model):
         on_delete=models.PROTECT,
         related_name="books",
     )
-    publication_year = models.IntegerField()
-    available = models.BooleanField(default=True)
+    ano_publicado = models.IntegerField()
+    disponivel = models.BooleanField(default=True)
     categories = models.ManyToManyField(Category, blank=True, related_name="books")
 
     def __str__(self):
