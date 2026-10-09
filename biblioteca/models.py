@@ -1,11 +1,35 @@
 from django.db import models
 
 
-class Livro(models.Model):
-    titulo = models.CharField(max_length=200)
-    autor = models.CharField(max_length=120)
-    ano_publicacao = models.IntegerField()
-    disponivel = models.BooleanField(default=True)
+class Author(models.Model):
+    name = models.CharField(max_length=120)
+    nationality = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "autores"
 
     def __str__(self):
-        return self.titulo
+        return self.name
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(
+        Author,
+        on_delete=models.PROTECT,
+        related_name="books",
+    )
+    publication_year = models.IntegerField()
+    available = models.BooleanField(default=True)
+    categories = models.ManyToManyField(Category, blank=True, related_name="books")
+
+    def __str__(self):
+        return self.title
