@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,16 @@
     <h1>Livros Disponíveis</h1>
     <ul>
         {% for livro in livros %}
-            <li>{{ livro.titulo }} - {{ livro.autor }} ({{ livro.ano_publicacao }}) Status: {{ livro.disponivel }}</li>
+                <li>{{ livro.title }}
+                    {% for author in livro.author.all %}
+                        <a href="{% url 'author_detail' author.pk %}">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Sem autor
+                    {% endfor %} -
+                    {{ livro.ano_publicado }} 
+                    {% for category in livro.categories.all %}
+                        {{category.name}}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}</li>
         {% endfor %}
     </ul>
 </body>

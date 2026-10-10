@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ author.name }}</title>
+</head>
+<body>
+    <h1>{{ author.name }}</h1>
+    {% if author.nationality %}
+        <p>Nacionalidade: {{ author.nationality }}</p>
+    {% endif %}
+    <h2>Livros</h2>
+    <ul>
+        {% for book in books %}
+            <li>{{ book.title }} ({{ book.publication_year }})</li>
+        {% empty %}
+            <li>Nenhum livro cadastrado.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
