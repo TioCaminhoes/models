@@ -22,8 +22,11 @@ def cadastrar_autor(request):
     if request.method == 'POST':
         form = AuthorForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('author_detail', author_id=form.instance.id)
+            Author.objects.create(
+                name=form.cleaned_data['name'],
+                nationality=form.cleaned_data['nationality']
+            )
+            return redirect('author_detail', author_id=Author.objects.last().id)
     else:
         form = AuthorForm()
     return render(request, 'cadastrarautor.html', {'form': form})
