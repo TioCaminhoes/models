@@ -23,7 +23,6 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ManyToManyField(
         Author,
-        blank=True,
         related_name="books",
     )
     ano_publicado = models.IntegerField()
