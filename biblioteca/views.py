@@ -49,7 +49,7 @@ def livro_form(request, book_id=None):
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
             livro = form.save()
-            return redirect('author_detail', author_id=livro.author.id)
+            return redirect('author_detail', author_id=livro.author.first().id)
     else:
         form = BookForm(instance=book)
 
