@@ -18,16 +18,27 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from biblioteca.views import author_detail, cadastrar_autor, livro_form, listar_autores, listar_livros
+from biblioteca.views import (
+    AuthorCreateView,
+    AuthorDetailView,
+    AuthorListView,
+    LivroCreateView,
+    LivroDeleteView,
+    LivroListView,
+    LivroUpdateView,
+    SobreView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', listar_livros, name='listar_livros'),
-    path('authors/<int:author_id>/', author_detail, name='author_detail'),
-    path('authors/cadastrar/', cadastrar_autor, name='cadastrar_autor'),
-    path('author_list/', listar_autores, name='listar_autores'),
-    path('livrosforms/<int:book_id>/', livro_form, name='livro_editar'),
-    path('livrosforms/novo/', livro_form, name='livro_novo'),
+    path('', LivroListView.as_view(), name='listar_livros'),
+    path('authors/<int:author_id>/', AuthorDetailView.as_view(), name='author_detail'),
+    path('authors/cadastrar/', AuthorCreateView.as_view(), name='cadastrar_autor'),
+    path('author_list/', AuthorListView.as_view(), name='listar_autores'),
+    path('livrosforms/<int:book_id>/', LivroUpdateView.as_view(), name='livro_editar'),
+    path('livrosforms/novo/', LivroCreateView.as_view(), name='livro_novo'),
+    path('livrosforms/<int:book_id>/excluir/', LivroDeleteView.as_view(), name='livro_excluir'),
+    path('sobre/', SobreView.as_view(), name='sobre'),
 ]
 
 if settings.DEBUG:

@@ -1,60 +1,89 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Count
+from django.urls import reverse, reverse_lazy
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
 from biblioteca.forms import AuthorForm, BookForm
 from biblioteca.models import Author, Book
-from django.db.models import Count
-
-def listar_livros(request):
-    livros = Book.objects.all()
-    return render(request, 'lista_livros.html', {
-        'livros': livros,
-    })
 
 
-def author_detail(request, author_id):
-    author = get_object_or_404(Author, pk=author_id)
-    return render(request, 'author_detail.html', {
-            'author': author, 
-            'books': author.books.all()
-        })
+class LivroListView(ListView):
+    model = Book
+    template_name = 'lista_livros.html'
+    context_object_name = 'livros'
 
-def cadastrar_autor(request):
-    if request.method == 'POST':
-        form = AuthorForm(request.POST)
-        if form.is_valid():
-            Author.objects.create(
-                name=form.cleaned_data['name'],
-                nationality=form.cleaned_data['nationality']
-            )
-            return redirect('author_detail', author_id=Author.objects.last().id)
-    else:
-        form = AuthorForm()
-    return render(request, 'cadastrarautor.html', {'form': form})
+    def get_queryset(self):
+        return Book.objects.order_by('title')  
 
-def listar_autores(request):
-    autores = Author.objects.annotate(num_books=Count('books'))
-    return render(request, 'listagem_autores.html', {'autores': autores})
+class LivroFormMixin:
+    model = Book
+    form_class = BookForm
+    template_name = 'livroform.html'     
+    titulo = ''
+    botao = ''
 
-def livro_form(request, book_id=None):
-    if book_id:
-        book = get_object_or_404(Book, pk=book_id)
-        titulo = 'Editar livro'
-        botao = 'Salvar alterações'
-    else:
-        book = None
-        titulo = 'Novo livro'
-        botao = 'Cadastrar livro'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = self.titulo
+        context['botao'] = self.botao
+        return context
 
-    if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES, instance=book)
-        if form.is_valid():
-            livro = form.save()
-            return redirect('author_detail', author_id=livro.author.first().id)
-    else:
-        form = BookForm(instance=book)
+    def get_success_url(self):
+        return reverse('author_detail', kwargs={'author_id': self.object.author.first().id})
 
-    return render(request, 'livroform.html', {
-        'form': form,
-        'titulo': titulo,
-        'botao': botao,
-    })
+class LivroCreateView(LivroFormMixin, CreateView):
+    titulo = 'Novo livro'
+    botao = 'Cadastrar livro'
+
+class LivroUpdateView(LivroFormMixin, UpdateView):
+    pk_url_kwarg = 'book_id'            
+    titulo = 'Editar livro'
+    botao = 'Salvar alterações'
+
+class LivroDeleteView(DeleteView):
+    model = Book
+    pk_url_kwarg = 'book_id'
+    template_name = 'livro_confirm_delete.html'
+    success_url = reverse_lazy('listar_livros')
+
+class AuthorDetailView(DetailView):      
+    model = Author
+    template_name = 'author_detail.html'
+    context_object_name = 'author'
+    pk_url_kwarg = 'author_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['books'] = self.object.books.all()
+        return context
+
+class AuthorCreateView(CreateView):
+    model = Author
+    form_class = AuthorForm
+    template_name = 'cadastrarautor.html'
+
+    def get_success_url(self):
+        return reverse('author_detail', kwargs={'author_id': self.object.pk})
+
+class AuthorListView(ListView):
+    model = Author
+    template_name = 'listagem_autores.html'
+    context_object_name = 'autores'
+
+    def get_queryset(self):
+        return Author.objects.annotate(num_books=Count('books'))
+
+class SobreView(TemplateView):
+    template_name = 'sobre.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total'] = Book.objects.count()
+        context['disponiveis'] = Book.objects.filter(disponivel=True).count()
+        return context

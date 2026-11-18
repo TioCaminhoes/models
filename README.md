@@ -9,3 +9,9 @@ associá-los a outro autor.
 
 por medidas de segurança, o django barra o cadastro e retorna a página de erro 403 - de acesso proíbido. 
 Pesquisando mais nas settings, é possível encontrar um middleware padrão chamado  'django.middleware.csrf.CsrfViewMiddleware', onde ele barra caso não seja gerado um código único secreto (No meio das ligações entre views e template, é passado pelo middleware). Sem esse token, o Django não consegue diferenciar se o envio partiu do seu formulário legítimo ou de um ataque do tipo CSRF.
+
+# Como rodar
+
+pip install -r requirements.txt   # Django e Pillow (o Pillow é necessário para o ImageField)
+python manage.py migrate
+python manage.py runserver

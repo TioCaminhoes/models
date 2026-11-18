@@ -17,10 +17,12 @@
                     {{ category.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
                 <a href="{% url 'livro_editar' livro.pk %}">Editar</a>
+                <a href="{% url 'livro_excluir' livro.pk %}">Excluir</a>
             </li>
         {% endfor %}
     </ul>
     <a href="{% url 'cadastrar_autor' %}">Cadastrar Autor</a>
     <a href="{% url 'listar_autores' %}">Listar Autores</a>
     <a href="{% url 'livro_novo' %}">Novo livro</a>
+    <a href="{% url 'sobre' %}">Sobre</a>
 </body>
