@@ -18,6 +18,9 @@
     <ul>
         {% for book in books %}
             <li>
+                {% if book.capa %}
+                    <img src="{{ book.capa.url }}" alt="Capa de {{ book.title }}" width="120">
+                {% endif %}
                 {{ book.title }} ({{ book.ano_publicado }})
 
                 <a href="{% url 'livro_editar' book.id %}">

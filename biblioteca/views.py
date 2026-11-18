@@ -46,7 +46,7 @@ def livro_form(request, book_id=None):
         botao = 'Cadastrar livro'
 
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             livro = form.save()
             return redirect('author_detail', author_id=livro.author.first().id)

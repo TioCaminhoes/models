@@ -22,7 +22,7 @@ class AuthorForm(forms.ModelForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['title', 'author', 'ano_publicado', 'paginas', 'isbn', 'disponivel', 'categories']
+        fields = ['title', 'author', 'ano_publicado', 'paginas', 'isbn', 'capa', 'disponivel', 'categories']
 
         labels = {
             'title': 'Título',
@@ -30,6 +30,7 @@ class BookForm(forms.ModelForm):
             'ano_publicado': 'Ano de Publicação',
             'paginas': 'Páginas',
             'isbn': 'ISBN',
+            'capa': 'Capa',
             'disponivel': 'Disponível',
             'categories': 'Categorias',
         }
@@ -37,6 +38,7 @@ class BookForm(forms.ModelForm):
         widgets = {
             'categories': forms.CheckboxSelectMultiple(),
             'author': forms.SelectMultiple(),
+            'capa': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
         }
 
         error_messages = {
