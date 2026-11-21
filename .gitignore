@@ -4,7 +4,7 @@
 
 # ==============================
 
-**pycache**/
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -154,4 +154,8 @@ dmypy.json
 
 # */migrations/*.py
 
-# !*/migrations/**init**.py
+# !*/migrations/__init__.py
+
+# Export de dados (contém dados reais)
+
+dados.json
